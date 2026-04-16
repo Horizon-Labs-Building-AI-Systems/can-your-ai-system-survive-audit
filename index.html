@@ -3,6 +3,7 @@
 <head>
   <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-XJCY4Q3PW9"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
@@ -81,6 +82,15 @@
       padding: 20px;
       border-radius: 10px;
     }
+
+    .alert-danger {
+  background: rgba(239,68,68,0.1);
+  border: 1px solid #ef4444;
+  color: #fca5a5;
+}
+
+h5 { color: #e5e7eb !important; }
+.progress { background-color: #374151 !important; }
   </style>
 </head>
 
@@ -163,6 +173,33 @@
               </select>
             </div>
 
+            <div class="mb-4">
+  <label>7. Was the input state valid and complete at decision time?</label>
+  <select class="form-select" id="state_validity">
+    <option value="YES">Yes</option>
+    <option value="PARTIAL">Partial</option>
+    <option value="NO">No</option>
+  </select>
+</div>
+
+<div class="mb-4">
+  <label>8. Was the system authorized to act on that state at that moment?</label>
+  <select class="form-select" id="authority_validity">
+    <option value="YES">Yes</option>
+    <option value="PARTIAL">Partial</option>
+    <option value="NO">No</option>
+  </select>
+</div>
+
+<div class="mb-4">
+  <label>9. Can the state be traced to a continuous, origin-preserved record?</label>
+  <select class="form-select" id="state_continuity">
+    <option value="YES">Yes</option>
+    <option value="PARTIAL">Partial</option>
+    <option value="NO">No</option>
+  </select>
+</div>
+
             <button type="button" class="btn btn-primary w-100 fw-bold" onclick="runAudit()">
               Run Audit
             </button>
@@ -190,7 +227,7 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
-<script src="app.js"></script>
+<script src="app.js?v=2"></script>
 
 </body>
 </html>
