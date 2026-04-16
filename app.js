@@ -1,5 +1,14 @@
+// ---------- Analytics Helper ----------
+function trackEvent(name, params = {}) {
+  if (typeof gtag === "function") {
+    gtag('event', name, params);
+  }
+}
+
+// ---------- Main Logic ----------
 function runAudit() {
 
+  // Collect answers ONCE
   const answers = {
     replay: document.getElementById("replay").value,
     determinism: document.getElementById("determinism").value,
@@ -8,6 +17,9 @@ function runAudit() {
     failure: document.getElementById("failure").value,
     idempotency: document.getElementById("idempotency").value
   };
+
+  // Track audit start
+  trackEvent('run_audit', answers);
 
   const weights = {
     replay: 2,
@@ -51,15 +63,19 @@ function runAudit() {
     className = "fail";
   }
 
+  // Track result
+  trackEvent('audit_result', { result: status });
+
   const shareLink = generateShareLink(answers);
 
+  // Render result
   document.getElementById("result").innerHTML = `
     <div class="p-3 border rounded">
       <h2 class="${className}">${status}</h2>
     </div>
 
     <div class="mt-3">
-      <input class="form-control" value="${shareLink}" readonly id="shareLink">
+      <input class="form-control text-center fw-semibold" value="${shareLink}" readonly id="shareLink">
       <button class="btn btn-outline-light mt-2 w-100" onclick="copyLink()">Copy Share Link</button>
     </div>
 
@@ -90,6 +106,7 @@ function runAudit() {
   document.getElementById("result").scrollIntoView({ behavior: "smooth" });
 }
 
+// ---------- Utilities ----------
 function generateShareLink(answers) {
   const params = new URLSearchParams(answers);
   return window.location.origin + window.location.pathname + "?" + params.toString();
@@ -100,9 +117,13 @@ function copyLink() {
   input.select();
   document.execCommand("copy");
   alert("Link copied!");
+
+  trackEvent('copy_share_link');
 }
 
 function downloadScreenshot() {
+  trackEvent('download_screenshot');
+
   const element = document.querySelector(".card");
 
   html2canvas(element).then(canvas => {
@@ -113,14 +134,19 @@ function downloadScreenshot() {
   });
 }
 
+// ---------- Load from URL ----------
 window.onload = function () {
   const params = new URLSearchParams(window.location.search);
 
   if (params.toString()) {
+
+    trackEvent('auto_run_from_url'); // FIXED ORDER
+
     for (let key of params.keys()) {
       const el = document.getElementById(key);
       if (el) el.value = params.get(key);
     }
+
     runAudit();
   }
 };
