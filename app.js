@@ -15,6 +15,7 @@ function runAudit() {
     boundary: document.getElementById("boundary").value,
     failure: document.getElementById("failure").value,
     idempotency: document.getElementById("idempotency").value,
+    workflow: document.getElementById("workflow").value,
 
     state_validity: document.getElementById("state_validity").value,
     authority_validity: document.getElementById("authority_validity").value,
@@ -100,6 +101,9 @@ function runAudit() {
 
   // ---------- Risk ----------
   let risk = "";
+
+
+
   let riskClass = "";
 
   if (admissibilityFail) {
@@ -116,6 +120,20 @@ function runAudit() {
     riskClass = "warn";
   }
 
+  let riskNote = "";
+
+if (risk === "DANGEROUS") {
+  riskNote = "System may execute invalid or unauthorized decisions in production.";
+}
+if (risk === "CAUTION") {
+  riskNote = "System has control gaps under edge conditions.";
+}
+if (risk === "SAFE") {
+  riskNote = "System operates within controlled execution boundaries.";
+}
+
+
+
   // AFTER admissibility processing
 window.auditFailures = [...new Set(failures)];
 window.auditFixMap = fixMap;
@@ -126,6 +144,16 @@ window.auditFixMap = fixMap;
     admissibility: admissibilityStatus,
     risk: risk
   });
+
+let signal = "";
+
+if (risk === "DANGEROUS") {
+  signal = "⚠️ Not safe for production deployment.";
+} else if (risk === "CAUTION") {
+  signal = "⚠️ Requires control improvements before scale.";
+} else {
+  signal = "✅ Safe for controlled production use.";
+}  
 
   const shareLink = generateShareLink(answers);
 
@@ -140,12 +168,16 @@ window.auditFixMap = fixMap;
   // ---------- UI ----------
   document.getElementById("result").innerHTML = `
     <div class="p-3 border rounded mb-3">
-      <h2 class="${finalClass}">${finalStatus}</h2>
+      <h6 class="text-secondary">Workflow</h6>
+      <h5>${answers.workflow.replaceAll("_", " ")}</h5>
+      <h2 class="${finalClass} mt-2">${finalStatus}</h2>
     </div>
 
     <div class="p-3 border rounded mb-3">
       <h5 class="section-title">Risk Classification</h5>
       <h3 class="${riskClass}">${risk}</h3>
+      <p class="mt-2 text-warning fw-semibold">${riskNote}</p>
+      <p class="mt-2 fw-bold">${signal}</p>
     </div>
 
     ${insight}
@@ -179,7 +211,7 @@ window.auditFixMap = fixMap;
     </div>
 
     <div class="mt-3">
-      <textarea class="form-control small" readonly id="shareLink">${shareLink}</textarea>
+      <input class="form-control text-center fw-semibold" readonly id="shareLink" value="${shareLink}">
       <button class="btn btn-outline-light mt-2 w-100" onclick="copyLink()">Copy Share Link</button>
     </div>
 
@@ -190,6 +222,13 @@ window.auditFixMap = fixMap;
     <button class="btn btn-outline-warning mt-3 w-100" onclick="downloadPDF()">
       Download Audit Report (PDF)
     </button>
+
+    <div class="mt-4 text-center">
+      <p class="text-secondary small">Want to audit a real workflow?</p>
+      <button class="btn btn-outline-warning w-100" onclick="openContact()">
+        Request Workflow Audit
+      </button>
+    </div>
   `;
 
   // ---------- Failures ----------
@@ -207,7 +246,9 @@ window.auditFixMap = fixMap;
 
   const uniqueFailures = [...new Set(failures)];
 
-  const failureTexts = uniqueFailures.map(f => failureMessages[f]);
+  const failureTexts = uniqueFailures
+  .map(f => failureMessages[f])
+  .filter(Boolean);
 
   let html = "<ul class='list-group mt-3'>";
 
@@ -234,7 +275,7 @@ window.auditFixMap = fixMap;
 
   let fixHTML = `
     <div class="mt-4 p-3 border rounded">
-      <h5 class="section-title">Recommended Fix Path</h5>
+      <h5 class="section-title">Recommended Fix Path (${sortedFailures.length} issues)</h5>
       <p class="text-secondary small">Fix admissibility issues first.</p>
       <ul class="list-group mt-3">
   `;
@@ -265,6 +306,7 @@ function generateShareLink(answers) {
 function copyLink() {
   const el = document.getElementById("shareLink");
   el.select();
+  el.setSelectionRange(0, 99999);
   document.execCommand("copy");
   alert("Link copied!");
   trackEvent('copy_share_link');
@@ -315,6 +357,7 @@ function downloadPDF() {
 };
 
   // ---------- Collect current values ----------
+  const workflow = document.querySelector("#result h5")?.innerText || "";
   const final = document.querySelector("#result h2")?.innerText || "";
   const risk = document.querySelector("#result h3")?.innerText || "";
 
@@ -325,12 +368,23 @@ function downloadPDF() {
 
   const uniqueFailures = [...new Set(window.auditFailures || [])];
 
-const failureTexts = uniqueFailures.map(f => failureMessagesMap[f]);
-const fixTexts = uniqueFailures.map(f => window.auditFixMap[f]);
+const failureTexts = uniqueFailures
+  .map(f => failureMessagesMap[f])
+  .filter(Boolean);
+
+ const fixTexts = uniqueFailures
+  .map(f => window.auditFixMap[f])
+  .filter(Boolean); 
 
   // ---------- Title ----------
-  doc.setFontSize(18);
-  doc.text("AI AUDIT REPORT", 20, 20);
+  doc.setFillColor(15, 23, 42);
+doc.rect(0, 0, 210, 20, 'F');
+
+doc.setTextColor(255,255,255);
+doc.setFontSize(16);
+doc.text("AI AUDIT REPORT", 20, 13);
+
+doc.setTextColor(0,0,0);
 
 doc.setFontSize(10);
 doc.text(`Audit ID: ${auditId}`, 20, 30);
@@ -338,14 +392,18 @@ doc.text(`Generated: ${now}`, 20, 35);
 
   // ---------- Summary ----------
   doc.setFontSize(12);
-  doc.text(`Final Status: ${final}`, 20, 40);
-  doc.text(`Risk: ${risk}`, 20, 50);
-  doc.text(`Admissibility: ${admissibility}`, 20, 60);
-  doc.text(`Execution: ${execution}`, 20, 70);
-  doc.text(`${executionText}`, 20, 80);
+
+  doc.text(`Workflow: ${workflow.replaceAll("_", " ")}`, 20, 40);
+  doc.text(`Final Status: ${final}`, 20, 50);
+  doc.text(`Risk: ${risk}`, 20, 60);
+  doc.text(`Admissibility: ${admissibility}`, 20, 70);
+  doc.text(`Execution: ${execution}`, 20, 80);
+  doc.text(`${executionText}`, 20, 90);
+  doc.setFontSize(11);
+  doc.text(`Total Issues: ${uniqueFailures.length}`, 20, 100);
 
   // ---------- Failures ----------
-  let y = 100;
+  let y = 130;
   doc.setFontSize(14);
   doc.text("Failure Points", 20, y);
 
@@ -375,8 +433,9 @@ doc.text(`Generated: ${now}`, 20, 35);
 
   fixTexts.forEach(fix => {
   const cleanFix = fix.replace(/[^\x00-\x7F]/g, "");
-  doc.text(`→ ${cleanFix}`, 20, y);
-    y += 8;
+  const lines = doc.splitTextToSize(`→ ${cleanFix}`, 170);
+    doc.text(lines, 20, y);
+    y += lines.length * 6 + 4;
 
     if (y > 270) {
       doc.addPage();
@@ -391,4 +450,8 @@ doc.text(`Generated: ${now}`, 20, 35);
 
   // ---------- Save ----------
   doc.save("ai-audit-report.pdf");
+}
+
+function openContact() {
+  window.open("https://www.linkedin.com/company/horizon-labs-deterministic-ai-systems/", "_blank");
 }

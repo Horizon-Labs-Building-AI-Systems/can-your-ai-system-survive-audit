@@ -98,6 +98,9 @@ h5 { color: #e5e7eb !important; }
 
 <!-- HERO -->
 <div class="hero">
+  <p class="mt-3 small text-secondary">
+  Built by Horizon Labs — Deterministic AI Systems
+  </p>
   <h1>Can Your AI Survive an Audit?</h1>
   <p>Most AI systems work. Very few can defend their decisions.</p>
 
@@ -117,11 +120,27 @@ h5 { color: #e5e7eb !important; }
       <div class="card shadow-lg">
         <div class="card-body">
 
-          <form>
+          <form onsubmit="event.preventDefault(); runAudit();">
+
+            <div class="mb-4">
+              <label>Workflow Type</label>
+              <select class="form-select" id="workflow">
+                <option value="" selected disabled>Select Workflow</option>
+                <option value="POS_TRANSACTION">POS Transaction</option>
+                <option value="FIELD_OPERATIONS">Field Operations</option>
+                <option value="PAYMENT_PROCESSING">Payment Processing</option>
+                <option value="CUSTOM">Custom Workflow</option>
+              </select>
+            </div>
+
+            <p class="small text-secondary text-center">
+              Answer all questions to evaluate system risk
+            </p>
 
             <div class="mb-4">
               <label>1. Can you replay a decision exactly?</label>
               <select class="form-select" id="replay">
+                <option value="" selected disabled>Select</option>
                 <option value="YES">Yes</option>
                 <option value="PARTIAL">Partial</option>
                 <option value="NO">No</option>
@@ -131,6 +150,7 @@ h5 { color: #e5e7eb !important; }
             <div class="mb-4">
               <label>2. Same input always gives same output?</label>
               <select class="form-select" id="determinism">
+                <option value="" selected disabled>Select</option>
                 <option value="YES">Yes</option>
                 <option value="PARTIAL">Partial</option>
                 <option value="NO">No</option>
@@ -140,6 +160,7 @@ h5 { color: #e5e7eb !important; }
             <div class="mb-4">
               <label>3. Is decision ownership clearly defined?</label>
               <select class="form-select" id="ownership">
+                <option value="" selected disabled>Select</option>
                 <option value="YES">Yes</option>
                 <option value="PARTIAL">Partial</option>
                 <option value="NO">No</option>
@@ -149,6 +170,7 @@ h5 { color: #e5e7eb !important; }
             <div class="mb-4">
               <label>4. Are authority boundaries enforced?</label>
               <select class="form-select" id="boundary">
+                <option value="" selected disabled>Select</option>
                 <option value="YES">Yes</option>
                 <option value="PARTIAL">Partial</option>
                 <option value="NO">No</option>
@@ -158,6 +180,7 @@ h5 { color: #e5e7eb !important; }
             <div class="mb-4">
               <label>5. Does failure keep system state safe?</label>
               <select class="form-select" id="failure">
+                <option value="" selected disabled>Select</option>
                 <option value="YES">Yes</option>
                 <option value="PARTIAL">Partial</option>
                 <option value="NO">No</option>
@@ -167,6 +190,7 @@ h5 { color: #e5e7eb !important; }
             <div class="mb-4">
               <label>6. Same request executes only once?</label>
               <select class="form-select" id="idempotency">
+                <option value="" selected disabled>Select</option>
                 <option value="YES">Yes</option>
                 <option value="PARTIAL">Partial</option>
                 <option value="NO">No</option>
@@ -176,6 +200,7 @@ h5 { color: #e5e7eb !important; }
             <div class="mb-4">
   <label>7. Was the input state valid and complete at decision time?</label>
   <select class="form-select" id="state_validity">
+    <option value="" selected disabled>Select</option>
     <option value="YES">Yes</option>
     <option value="PARTIAL">Partial</option>
     <option value="NO">No</option>
@@ -185,6 +210,7 @@ h5 { color: #e5e7eb !important; }
 <div class="mb-4">
   <label>8. Was the system authorized to act on that state at that moment?</label>
   <select class="form-select" id="authority_validity">
+    <option value="" selected disabled>Select</option>
     <option value="YES">Yes</option>
     <option value="PARTIAL">Partial</option>
     <option value="NO">No</option>
@@ -194,6 +220,7 @@ h5 { color: #e5e7eb !important; }
 <div class="mb-4">
   <label>9. Can the state be traced to a continuous, origin-preserved record?</label>
   <select class="form-select" id="state_continuity">
+    <option value="" selected disabled>Select</option>
     <option value="YES">Yes</option>
     <option value="PARTIAL">Partial</option>
     <option value="NO">No</option>
@@ -201,7 +228,7 @@ h5 { color: #e5e7eb !important; }
 </div>
 
             <button type="button" class="btn btn-primary w-100 fw-bold" onclick="runAudit()">
-              Run Audit
+              Evaluate System Risk
             </button>
 
           </form>
