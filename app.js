@@ -177,7 +177,13 @@ if (risk === "DANGEROUS") {
       <h5 class="section-title">Risk Classification</h5>
       <h3 class="${riskClass}">${risk}</h3>
       <p class="mt-2 text-warning fw-semibold">${riskNote}</p>
-      <p class="mt-2 fw-bold">${signal}</p>
+      <p class="mt-2 fw-bold ${
+        risk === "DANGEROUS" ? "text-danger" :
+        risk === "CAUTION" ? "text-warning" :
+        "text-success"
+      }">
+        ${signal}
+      </p>
     </div>
 
     ${insight}
@@ -225,9 +231,20 @@ if (risk === "DANGEROUS") {
 
     <div class="mt-4 text-center">
       <p class="text-secondary small">Want to audit a real workflow?</p>
-      <button class="btn btn-outline-warning w-100" onclick="openContact()">
-        Request Workflow Audit
-      </button>
+
+      <a 
+        href="https://wa.me/917042220456?text=Hi%20Prashant%2C%20I%20ran%20the%20AI%20audit%20tool%20and%20want%20to%20discuss%20a%20workflow%20audit." 
+        target="_blank"
+        class="btn btn-success w-100 mb-2">
+        Chat on WhatsApp
+      </a>
+
+      <a 
+        href="https://www.linkedin.com/company/horizon-labs-deterministic-ai-systems/" 
+        target="_blank"
+        class="btn btn-outline-warning w-100">
+        Follow on LinkedIn
+      </a>
     </div>
   `;
 
