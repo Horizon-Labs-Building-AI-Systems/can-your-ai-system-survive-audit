@@ -472,3 +472,10 @@ doc.text(`Generated: ${now}`, 20, 35);
 function openContact() {
   window.open("https://www.linkedin.com/company/horizon-labs-deterministic-ai-systems/", "_blank");
 }
+
+function showHelp(key) {
+  document.getElementById("helpText").innerText = questionHelp[key];
+  const box = document.getElementById("helpBox");
+  box.style.display = "block";
+  box.scrollIntoView({ behavior: "smooth", block: "center" });
+}
