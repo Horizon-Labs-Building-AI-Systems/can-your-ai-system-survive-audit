@@ -91,10 +91,163 @@
 
 h5 { color: #e5e7eb !important; }
 .progress { background-color: #374151 !important; }
+
+.guide-box {
+  background: #020617;
+  border: 1px solid #3b82f6;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 15px;
+  color: #e5e7eb;
+}
+
+.guide-box a {
+  color: #3b82f6;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.guide-box a:hover {
+  text-decoration: underline;
+}
+
   </style>
 </head>
 
 <body>
+
+<script>
+const questionHelp = {
+  replay: `
+WHAT: Can you reconstruct the exact decision?
+
+CHECK:
+- Decision logs
+- Input/output snapshots
+- Metadata storage
+
+YES IF:
+- Same inputs reproduce same decision exactly
+
+NO IF:
+- You rely on memory or partial logs
+`,
+
+  determinism: `
+WHAT: Same input → same output?
+
+CHECK:
+- Randomness in system
+- Time-based variation
+- Async dependencies
+
+YES IF:
+- Output is identical every time
+
+NO IF:
+- Output varies across runs
+`,
+
+  ownership: `
+WHAT: Who is responsible for this decision?
+
+CHECK:
+- Ownership mapping
+- Service or human accountability
+
+YES IF:
+- Clear owner exists for each decision
+
+NO IF:
+- Responsibility is unclear
+`,
+
+  boundary: `
+WHAT: Is authority enforced before action?
+
+CHECK:
+- Permission checks
+- Role validation
+
+YES IF:
+- Action blocked without explicit permission
+
+NO IF:
+- System assumes authority
+`,
+
+  failure: `
+WHAT: Does failure preserve safe state?
+
+CHECK:
+- Rollback mechanisms
+- Error handling
+
+YES IF:
+- System returns to safe state
+
+NO IF:
+- Partial or corrupted state possible
+`,
+
+  idempotency: `
+WHAT: Same request executes only once?
+
+CHECK:
+- Idempotency keys
+- Duplicate protection
+
+YES IF:
+- Repeated request has no duplicate effect
+
+NO IF:
+- Same request triggers multiple actions
+`,
+
+  state_validity: `
+WHAT: Was input data valid at decision time?
+
+CHECK:
+- Data completeness
+- Freshness (timestamps)
+- Validation rules
+
+YES IF:
+- All required data present and current
+
+NO IF:
+- Missing or stale inputs
+`,
+
+  authority_validity: `
+WHAT: Was system authorized at that moment?
+
+CHECK:
+- Access control logs
+- Role/permission at execution time
+
+YES IF:
+- Authorization verified at execution
+
+NO IF:
+- Assumed or outdated permissions
+`,
+
+  state_continuity: `
+WHAT: Can you trace data to origin?
+
+CHECK:
+- Data lineage
+- Source tracking
+
+YES IF:
+- Full trace from source → decision
+
+NO IF:
+- Broken or missing lineage
+`
+};
+</script>
 
 <!-- HERO -->
 <div class="hero">
@@ -137,8 +290,23 @@ h5 { color: #e5e7eb !important; }
               Answer all questions to evaluate system risk
             </p>
 
+            <p class="small text-warning text-center">
+                If evidence is incomplete → choose PARTIAL  
+                If no evidence → choose NO
+              </p>
+
+              <p class="small text-center text-warning">
+              How to answer:
+              <br>YES → You have concrete evidence
+              <br>PARTIAL → Some evidence exists but incomplete
+              <br>NO → No verifiable evidence
+              </p>
+
             <div class="mb-4">
-              <label>1. Can you replay a decision exactly?</label>
+              <label>
+                1. Can you replay a decision exactly?
+                <span onclick="showHelp('replay')" style="cursor:pointer;">ⓘ</span>
+              </label>
               <select class="form-select" id="replay">
                 <option value="" selected disabled>Select</option>
                 <option value="YES">Yes</option>
@@ -148,7 +316,10 @@ h5 { color: #e5e7eb !important; }
             </div>
 
             <div class="mb-4">
-              <label>2. Same input always gives same output?</label>
+              <label>
+                2. Same input always gives same output?
+                <span onclick="showHelp('determinism')" style="cursor:pointer;">ⓘ</span>
+              </label>
               <select class="form-select" id="determinism">
                 <option value="" selected disabled>Select</option>
                 <option value="YES">Yes</option>
@@ -158,7 +329,10 @@ h5 { color: #e5e7eb !important; }
             </div>
 
             <div class="mb-4">
-              <label>3. Is decision ownership clearly defined?</label>
+              <label>
+                3. Is decision ownership clearly defined?
+                <span onclick="showHelp('ownership')" style="cursor:pointer;">ⓘ</span>
+              </label>
               <select class="form-select" id="ownership">
                 <option value="" selected disabled>Select</option>
                 <option value="YES">Yes</option>
@@ -168,7 +342,10 @@ h5 { color: #e5e7eb !important; }
             </div>
 
             <div class="mb-4">
-              <label>4. Are authority boundaries enforced?</label>
+              <label>
+                4. Are authority boundaries enforced?
+                <span onclick="showHelp('boundary')" style="cursor:pointer;">ⓘ</span>
+              </label>
               <select class="form-select" id="boundary">
                 <option value="" selected disabled>Select</option>
                 <option value="YES">Yes</option>
@@ -178,7 +355,10 @@ h5 { color: #e5e7eb !important; }
             </div>
 
             <div class="mb-4">
-              <label>5. Does failure keep system state safe?</label>
+              <label>
+                5. Does failure keep system state safe?
+                <span onclick="showHelp('failure')" style="cursor:pointer;">ⓘ</span>
+              </label>
               <select class="form-select" id="failure">
                 <option value="" selected disabled>Select</option>
                 <option value="YES">Yes</option>
@@ -188,7 +368,10 @@ h5 { color: #e5e7eb !important; }
             </div>
 
             <div class="mb-4">
-              <label>6. Same request executes only once?</label>
+              <label>
+                6. Same request executes only once?
+                <span onclick="showHelp('idempotency')" style="cursor:pointer;">ⓘ</span>
+              </label>
               <select class="form-select" id="idempotency">
                 <option value="" selected disabled>Select</option>
                 <option value="YES">Yes</option>
@@ -198,17 +381,23 @@ h5 { color: #e5e7eb !important; }
             </div>
 
             <div class="mb-4">
-  <label>7. Was the input state valid and complete at decision time?</label>
-  <select class="form-select" id="state_validity">
-    <option value="" selected disabled>Select</option>
-    <option value="YES">Yes</option>
-    <option value="PARTIAL">Partial</option>
-    <option value="NO">No</option>
+              <label>
+                7. Was the input state valid and complete at decision time?
+                <span onclick="showHelp('state_validity')" style="cursor:pointer;">ⓘ</span>
+              </label>
+              <select class="form-select" id="state_validity">
+                <option value="" selected disabled>Select</option>
+                <option value="YES">Yes</option>
+                <option value="PARTIAL">Partial</option>
+                <option value="NO">No</option>
   </select>
 </div>
 
 <div class="mb-4">
-  <label>8. Was the system authorized to act on that state at that moment?</label>
+  <label>
+    8. Was the system authorized to act on that state at that moment?
+    <span onclick="showHelp('authority_validity')" style="cursor:pointer;">ⓘ</span>
+  </label>
   <select class="form-select" id="authority_validity">
     <option value="" selected disabled>Select</option>
     <option value="YES">Yes</option>
@@ -218,7 +407,10 @@ h5 { color: #e5e7eb !important; }
 </div>
 
 <div class="mb-4">
-  <label>9. Can the state be traced to a continuous, origin-preserved record?</label>
+  <label>
+    9. Can the state be traced to a continuous, origin-preserved record?
+    <span onclick="showHelp('state_continuity')" style="cursor:pointer;">ⓘ</span>
+  </label>
   <select class="form-select" id="state_continuity">
     <option value="" selected disabled>Select</option>
     <option value="YES">Yes</option>
@@ -231,7 +423,23 @@ h5 { color: #e5e7eb !important; }
               Evaluate System Risk
             </button>
 
+            <div class="guide-box text-center mt-3">
+              <span class="fw-semibold">Not sure how to answer?</span>
+              <a href="guide.html" target="_blank" class="ms-2">View detailed guide →</a>
+            </div>
+
           </form>
+
+          <div id="helpBox" class="mt-3 p-3 border rounded" style="display:none;">
+            <pre id="helpText" style="white-space:pre-wrap; font-size:13px;"></pre>
+          </div>
+
+<script>
+function showHelp(key) {
+  document.getElementById("helpText").innerText = questionHelp[key];
+  document.getElementById("helpBox").style.display = "block";
+}
+</script>
 
           <div id="result" class="mt-4 text-center"></div>
           <div class="text-center mt-4">

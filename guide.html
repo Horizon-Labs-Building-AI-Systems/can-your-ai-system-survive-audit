@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>How to Answer the 9 AI Audit Questions</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <style>
+    body {
+      background: #0f172a;
+      color: #e5e7eb;
+      font-family: Inter, Arial;
+      margin: 0;
+      padding: 0;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: auto;
+      padding: 30px 20px;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 10px;
+    }
+
+    p.subtitle {
+      color: #9ca3af;
+      margin-bottom: 30px;
+    }
+
+    .rule-box {
+      background: #020617;
+      border: 1px solid #3b82f6;
+      border-radius: 10px;
+      padding: 15px;
+      margin-bottom: 30px;
+      font-size: 14px;
+    }
+
+    .card {
+      background: #111827;
+      border: 1px solid #374151;
+      border-radius: 12px;
+      padding: 18px;
+      margin-bottom: 20px;
+      text-align: left;
+    }
+
+    .card h3 {
+      margin-bottom: 10px;
+      font-size: 18px;
+    }
+
+    .section {
+      margin-top: 10px;
+      font-size: 14px;
+    }
+
+    .label {
+      font-weight: 600;
+      color: #93c5fd;
+    }
+
+    .yes { color: #22c55e; }
+    .no { color: #ef4444; }
+
+    hr {
+      border-color: #374151;
+      margin: 30px 0;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <h1>How to Answer the 9 Questions</h1>
+  <p class="subtitle">
+    Don't guess. Inspect your system. Answer based on evidence.
+  </p>
+
+  <div class="rule-box">
+    <b>How to Answer:</b><br><br>
+    YES &rarr; You can verify this with logs / system behavior<br>
+    PARTIAL &rarr; Exists but incomplete or inconsistent<br>
+    NO &rarr; No evidence or not enforced
+  </div>
+
+  <!-- CARD TEMPLATE -->
+  
+  <div class="card">
+    <h3>1. Replayability</h3>
+
+    <div class="section">
+      <span class="label">Where to check:</span><br>
+      Decision logs, input/output snapshots, stored metadata
+    </div>
+
+    <div class="section">
+      <span class="label">Test:</span><br>
+      Take one past decision &rarr; try to reproduce it exactly
+    </div>
+
+    <div class="section yes">
+      YES &rarr; Same input produces same decision exactly
+    </div>
+
+    <div class="section no">
+      NO &rarr; You cannot fully reconstruct the decision
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>2. Determinism</h3>
+
+    <div class="section">
+      <span class="label">Where to check:</span><br>
+      Model behavior, randomness, time-based inputs
+    </div>
+
+    <div class="section">
+      <span class="label">Test:</span><br>
+      Run same input multiple times
+    </div>
+
+    <div class="section yes">
+      YES &rarr; Output is identical every time
+    </div>
+
+    <div class="section no">
+      NO &rarr; Output changes across runs
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>3. Ownership</h3>
+
+    <div class="section">
+      <span class="label">Where to check:</span><br>
+      System design, service responsibility, team ownership
+    </div>
+
+    <div class="section">
+      <span class="label">Test:</span><br>
+      Ask: Who is accountable for this decision?
+    </div>
+
+    <div class="section yes">
+      YES &rarr; Clear owner exists
+    </div>
+
+    <div class="section no">
+      NO &rarr; Responsibility unclear
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>4. Authority Boundaries</h3>
+
+    <div class="section">
+      <span class="label">Where to check:</span><br>
+      Permission checks, role validation
+    </div>
+
+    <div class="section">
+      <span class="label">Test:</span><br>
+      Can system act without explicit permission?
+    </div>
+
+    <div class="section yes">
+      YES &rarr; Action blocked without permission
+    </div>
+
+    <div class="section no">
+      NO &rarr; System assumes authority
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>5. Failure Safety</h3>
+
+    <div class="section">
+      <span class="label">Where to check:</span><br>
+      Error handling, rollback logic
+    </div>
+
+    <div class="section">
+      <span class="label">Test:</span><br>
+      Force a failure mid-process
+    </div>
+
+    <div class="section yes">
+      YES &rarr; System returns to safe state
+    </div>
+
+    <div class="section no">
+      NO &rarr; Partial or corrupted state remains
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>6. Idempotency</h3>
+
+    <div class="section">
+      <span class="label">Where to check:</span><br>
+      API design, request handling
+    </div>
+
+    <div class="section">
+      <span class="label">Test:</span><br>
+      Send same request multiple times
+    </div>
+
+    <div class="section yes">
+      YES &rarr; Only one execution happens
+    </div>
+
+    <div class="section no">
+      NO &rarr; Duplicate actions occur
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>7. State Validity</h3>
+
+    <div class="section">
+      <span class="label">Where to check:</span><br>
+      Input validation, timestamps, completeness checks
+    </div>
+
+    <div class="section">
+      <span class="label">Test:</span><br>
+      Remove or delay key input data
+    </div>
+
+    <div class="section yes">
+      YES &rarr; System blocks decision
+    </div>
+
+    <div class="section no">
+      NO &rarr; System still proceeds
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>8. Authority Validity</h3>
+
+    <div class="section">
+      <span class="label">Where to check:</span><br>
+      Access control at execution time
+    </div>
+
+    <div class="section">
+      <span class="label">Test:</span><br>
+      Try executing with expired/invalid permission
+    </div>
+
+    <div class="section yes">
+      YES &rarr; System blocks action
+    </div>
+
+    <div class="section no">
+      NO &rarr; System allows action
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>9. State Continuity</h3>
+
+    <div class="section">
+      <span class="label">Where to check:</span><br>
+      Data lineage, audit trails
+    </div>
+
+    <div class="section">
+      <span class="label">Test:</span><br>
+      Trace decision back to original source
+    </div>
+
+    <div class="section yes">
+      YES &rarr; Full trace exists
+    </div>
+
+    <div class="section no">
+      NO &rarr; Missing or broken lineage
+    </div>
+  </div>
+
+  <hr>
+
+  <p style="color:#9ca3af; font-size:13px;">
+    If you cannot verify it &rarr; it is NOT a YES.
+  </p>
+
+</div>
+
+</body>
+</html>
